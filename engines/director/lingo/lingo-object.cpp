@@ -172,7 +172,9 @@
 #include "director/lingo/xtras/f/filextra4.h"
 #include "director/lingo/xtras/g/getdir.h"
 #include "director/lingo/xtras/g/glu32.h"
+#include "director/lingo/xtras/c/cpuxtra.h"
 #include "director/lingo/xtras/k/keypoll.h"
+#include "director/lingo/xtras/m/miles.h"
 #include "director/lingo/xtras/m/masterapp.h"
 #include "director/lingo/xtras/m/mbox.h"
 #include "director/lingo/xtras/m/mui.h"
@@ -339,7 +341,9 @@ static const struct XLibProto {
 	XLIBDEF(IsPippin,			kXObj,			400),	// D4
 	XLIBDEF(JITDraw3XObj,		kXObj,			400),	// D4
 	XLIBDEF(JourneyWareXINIXObj,kXObj,			400),	// D4
+	XLIBDEF(CpuXtra,			kXtraObj,		500),	// D5
 	XLIBDEF(KeypollXtra,		kXtraObj,		500),	// D5
+	XLIBDEF(MilesXtra,			kXtraObj,		500),	// D5
 	XLIBDEF(LabelDrvXObj,		kXObj,			400),	// D4
 	XLIBDEF(ListDevXObj,		kXObj,			500),	// D5
 	XLIBDEF(MBoxXtra,			kXtraObj,					500),	// D5

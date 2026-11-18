@@ -972,7 +972,28 @@ void MacFontManager::generateTTFFont(MacFont &toFont, Common::SeekableReadStream
 	// TODO: Handle getSlant() flags
 
 	stream->seek(0);
-	Font *font = Graphics::loadTTFFont(stream, DisposeAfterUse::NO, toFont.getSize(), Graphics::kTTFSizeModeCharacter, 0, 0, _ttfRenderMode);
+
+	// Text runs for classic Mac fonts are passed to the font as 8-bit Mac
+	// Roman bytes (see MacFontRun::getEncodedText()), while the TrueType
+	// renderer looks glyphs up by Unicode code point. Without a mapping,
+	// every byte above 0x7F (accented letters, curly quotes...) ends up
+	// on the wrong glyph or on none at all. Map Mac Roman to Unicode.
+	const uint32 *mapping = nullptr;
+	static uint32 macRomanMapping[256];
+	static bool macRomanMappingReady = false;
+	if (getFontEncoding(toFont.getId()) == Common::kMacRoman) {
+		if (!macRomanMappingReady) {
+			for (uint i = 0; i < 256; i++) {
+				char c = (char)i;
+				Common::U32String u = Common::String(&c, 1).decode(Common::kMacRoman);
+				macRomanMapping[i] = u.empty() ? i : u[0];
+			}
+			macRomanMappingReady = true;
+		}
+		mapping = macRomanMapping;
+	}
+
+	Font *font = Graphics::loadTTFFont(stream, DisposeAfterUse::NO, toFont.getSize(), Graphics::kTTFSizeModeCharacter, 0, 0, _ttfRenderMode, mapping);
 
 	if (!font) {
 		warning("Failed to generate font '%s'", toPrintable(getFontName(toFont)).c_str());
