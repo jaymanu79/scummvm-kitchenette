@@ -1,5 +1,9 @@
 name: CI
-on: [push, pull_request]
+# Fork: the upstream CI matrix is not run on the kitchenette branch
+on:
+  push:
+    branches-ignore: [kitchenette]
+  pull_request:
 #  schedule:
 #    - cron: '0 0-23/4 * * *'
 permissions:

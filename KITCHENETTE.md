@@ -14,6 +14,16 @@ projet officiel (voir `AI-GUIDELINES.md`).
 | `engines/director/metaengine.cpp` | Commandes « Buzzer joueur 1/2/3 » réaffectables (touche, souris, manette). |
 | `engines/director/score.cpp` | Director 6 : un sprite modifié par le Lingo sans `puppetSprite` (« auto-puppet ») rend la main au score à la fin de sa plage. Corrige les lettres en pavés. |
 
+## Paquets tout faits
+
+GitHub Actions (`.github/workflows/kitchenette-builds.yml`) compile à chaque push sur `kitchenette` :
+
+- **Ubuntu** : `scummvm-kitchenette_*.deb`, installé dans `/opt/scummvm-kitchenette`, lancé par `scummvm-kitchenette`.
+  Ne remplace pas la ScummVM officielle.
+- **Android** : `ScummVM-debug.apk` (arm64), application `org.scummvm.scummvm.debug`, à côté de l'officielle.
+
+Les fichiers sont dans l'onglet Actions → l'exécution → Artifacts.
+
 ## Compiler (Ubuntu)
 
 ```sh
@@ -24,11 +34,16 @@ make -j$(nproc)
 
 ## Préparer le jeu
 
-Le lanceur et les Xtras sont dans l'installeur Wise du CD. Il faut un dossier qui contient à la fois :
+Le lanceur (`Kitchenette.exe`), les Xtras, `Lingo.ini` et trois casts ne sont pas en clair sur le CD : ils sont
+compressés dans l'installeur Wise `Installation.EXE`. Pas besoin de Windows pour les sortir :
 
-- le contenu du CD (`DATA/`, `Installation.EXE`…) ;
-- les fichiers installés : `Kitchenette.exe`, `Lingo.ini`, `jojo.cct`, `Themes/` (Intit.cst, listQ.cst, themes.cst),
-  `Jojo/ph.cst`, `Xtras/` (Cpuxtra, Fileio, Mix32, mssx32, Sound Import Export, Swadcmpr).
+```sh
+7z x Kitchenette.iso -o/tmp/kitchenette-cd        # ou monter l'ISO
+python3 dists/kitchenette/kitchenette-install.py /tmp/kitchenette-cd ~/Jeux/Kitchenette
+```
+
+Le script copie le CD dans le dossier de destination et y ajoute les fichiers extraits de l'installeur
+(reconnus par leur MD5 : il ne marche qu'avec cette version du CD).
 
 Puis :
 
