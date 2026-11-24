@@ -990,7 +990,17 @@ void Score::updateSprites(RenderMode mode, bool withClean) {
 			_movie->_videoPlayback = true;
 		}
 
-		if (channel->isDirty(nextSprite) || widgetRedrawn || mode == kRenderForceUpdate) {
+		// From D6 on, sprite properties set from Lingo without puppetSprite (auto-puppet)
+		// only last until the end of the sprite span. Once the playhead reaches a frame
+		// where the channel holds another span, or nothing, the score takes over again.
+		bool spanEnded = false;
+		if (withClean && currentSprite && nextSprite && currentSprite->_autoPuppet && !currentSprite->_puppet &&
+				g_director->getVersion() >= 600 && currentSprite->_spriteListIdx != nextSprite->_spriteListIdx) {
+			currentSprite->_autoPuppet = kAPNone;
+			spanEnded = true;
+		}
+
+		if (spanEnded || channel->isDirty(nextSprite) || widgetRedrawn || mode == kRenderForceUpdate) {
 
 			if (currentSprite && currentSprite->_cast && currentSprite->_cast->_erase) {
 				currentSprite->_cast->_erase = false;

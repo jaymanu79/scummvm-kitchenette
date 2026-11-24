@@ -10,7 +10,7 @@ projet officiel (voir `AI-GUIDELINES.md`).
 |---|---|
 | `engines/director/lingo/xtras/m/miles.*` | Xtra **Miles Sound System** (`mssx32.x32`) : ouverture de WAV sur disque ou de sons de cast, lecture via le mixeur ScummVM, volume, boucles, pause. `MilesGetStatus` renvoie 4 pendant la lecture, 2 sinon. |
 | `engines/director/lingo/xtras/c/cpuxtra.*` | Xtra **Cpuxtra** (Le Lab) : `CpuId` renvoie `[#CPU:5, #FPU:1, #SPEED:233, #MMX:1]`. |
-| `graphics/macgui/macfontmanager.cpp` | Table Mac Roman → Unicode pour les polices TrueType de remplacement (accents). |
+| `engines/director/score.cpp` | Director 6 : un sprite modifié par le Lingo sans `puppetSprite` (« auto-puppet ») rend la main au score à la fin de sa plage. Corrige les lettres en pavés. |
 
 ## Compiler (Ubuntu)
 
@@ -47,14 +47,13 @@ installée suffisent, sinon `--extrapath=/usr/share/scummvm`.
 ## Ce qui marche
 
 Intro, choix des joueurs, mosaïque des thèmes, animations de thème, « QUESTION n », questions avec accents,
-score, enchères. Jamais joué une partie complète.
+mini-jeux (grille-pain, lave-linge, tourne-disque) avec leurs lettres, score, enchères. Jamais joué une partie complète.
 
 ## Reste à faire
 
-1. **Pavés sur les lettres des réponses** : sprites qui gardent l'encre « Copy » au lieu de
-   « Background Transparent ». Piste : le marqueur `_autoPuppet` des sprites (Director 6) n'est jamais remis à
-   zéro à la fin de la plage du sprite dans le score (`engines/director/channel.cpp`, `Channel::setClean`).
-   Deux essais naïfs (remise à zéro au changement de plage / quand la piste devient vide) cassent d'autres écrans.
+1. **Erreur Lingo dans le jeu du tourne-disque** : `getAt` sur `gMilesReps` qui vaut 0
+   (`PlayRepSound` ← `ChangeDisqueRep` ← `DisqueAnim`). Les sons des réponses sont déchargés par
+   `IncrSequence` alors que l'animation du disque tourne encore. Vu une fois, après des appuis au hasard.
 2. **Palette du lave-linge** (écran du nombre de joueurs) : couleurs fausses ; l'image d'origine utilise
    la palette `ACCES00000.PICT Palette` (cast `log`).
 3. **Détection** : ajouter l'empreinte de `Kitchenette.exe` à `engines/director/detection_tables.h` pour que le
