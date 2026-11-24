@@ -843,6 +843,7 @@ static const PlainGameDescriptor directorGames[] = {
 	{ "jollypost1",			"The Jolly Post Office"},
 	{ "jollypost2",			"The Jolly Postman's Party"},
 	{ "kfk",				"Kung Fu Kim" },
+	{ "kitchenette",		"Kitchenette" },
 	{ "letterrally",		"Letter Rally" },
 	{ "limit0",				"Limit 0" },
 	{ "littlebilly",		"Little Billy" },
@@ -8816,6 +8817,9 @@ static const DirectorGameDescription gameDescriptions[] = {
 	WINGAME1_l("kanazawa", "", "KANAZAWA.EXE",	  "t:3e54b92d68a7e1bfaf4b92b37f4f9eea", 1896688, Common::JA_JPN, 600),
 
 	WINGAME1_l("kcd", "K15 2001", "V_Fi.exe", "t:2fa05adc6cbc2c46702d4992a82f932b", 1704035, Common::FI_FIN, 602),
+
+	// Requires installation: the projector and Xtras come from Installation.EXE
+	WINGAME1_l("kitchenette", "", "Kitchenette.exe", "t:af0271696f70b8803a687cefe7989a13", 2312827, Common::FR_FRA, 600),
 
 	// Mac version requires installation
 	MACGAME1("kingandi", "", "The King and I Thinking Adv", "r:ef18d569c3cb7700367427cfc9150656",  115776, 602),

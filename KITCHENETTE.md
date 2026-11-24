@@ -10,6 +10,8 @@ projet officiel (voir `AI-GUIDELINES.md`).
 |---|---|
 | `engines/director/lingo/xtras/m/miles.*` | Xtra **Miles Sound System** (`mssx32.x32`) : ouverture de WAV sur disque ou de sons de cast, lecture via le mixeur ScummVM, volume, boucles, pause. `MilesGetStatus` renvoie 4 pendant la lecture, 2 sinon. |
 | `engines/director/lingo/xtras/c/cpuxtra.*` | Xtra **Cpuxtra** (Le Lab) : `CpuId` renvoie `[#CPU:5, #FPU:1, #SPEED:233, #MMX:1]`. |
+| `engines/director/detection_tables.h` | Kitchenette reconnu sous son nom (Windows, français), cible `kitchenette-win-fr`. |
+| `engines/director/metaengine.cpp` | Commandes « Buzzer joueur 1/2/3 » réaffectables (touche, souris, manette). |
 | `engines/director/score.cpp` | Director 6 : un sprite modifié par le Lingo sans `puppetSprite` (« auto-puppet ») rend la main au score à la fin de sa plage. Corrige les lettres en pavés. |
 
 ## Compiler (Ubuntu)
@@ -32,8 +34,10 @@ Puis :
 
 ```sh
 ./scummvm --add -p /chemin/vers/kitchenette
-./scummvm director-win-fallback
+./scummvm kitchenette-win-fr
 ```
+
+Au lancement, ScummVM prévient que le jeu n'est pas entièrement supporté : choisir « Démarrer quand même ».
 
 Il faut les fichiers de données de ScummVM (`classicmacfonts.dat`, `fonts.dat`…) : ceux d'une ScummVM
 installée suffisent, sinon `--extrapath=/usr/share/scummvm`.
@@ -42,6 +46,9 @@ installée suffisent, sinon `--extrapath=/usr/share/scummvm`.
 
 - **1 / 2 / 3** : nombre de joueurs, puis saisie des noms au clavier + Entrée.
 - **A / N / P** : buzzers des joueurs 1, 2, 3 (arrêter la mosaïque, répondre).
+  Réaffectables dans Options du jeu → Raccourcis → « Kitchenette buzzers » : n'importe quelle touche, bouton de
+  souris ou bouton de manette. ScummVM ne gère qu'une manette à la fois.
+  Attention : la touche choisie tape la lettre du buzzer (a, n ou p) aussi pendant la saisie des noms.
 - **Échap** : pause.
 
 ## Ce qui marche
@@ -56,6 +63,4 @@ mini-jeux (grille-pain, lave-linge, tourne-disque) avec leurs lettres, score, en
    `IncrSequence` alors que l'animation du disque tourne encore. Vu une fois, après des appuis au hasard.
 2. **Palette du lave-linge** (écran du nombre de joueurs) : couleurs fausses ; l'image d'origine utilise
    la palette `ACCES00000.PICT Palette` (cast `log`).
-3. **Détection** : ajouter l'empreinte de `Kitchenette.exe` à `engines/director/detection_tables.h` pour que le
-   jeu soit reconnu sous son nom.
-4. Vérifier à l'oreille le son Miles (testé seulement par le timing des animations).
+3. Vérifier à l'oreille le son Miles (testé seulement par le timing des animations).
