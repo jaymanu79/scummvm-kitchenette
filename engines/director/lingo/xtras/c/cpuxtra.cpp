@@ -29,15 +29,17 @@
 
 /**************************************************
  *
- * CpuXtra (Copyright Le Lab, August 1996)
- *
- * xtra Cpuxtra
- * new object me
- * * CpuId string str -- Global level cpuid method : returns cpu type, speed & features
- *
- * Returns [#CPU:%lu, #FPU:%lu, #SPEED:%lu, #MMX:%d]
+ * USED IN:
+ * Kitchenette (Le Lab, Windows)
  *
  **************************************************/
+
+/*
+-- xtra Cpuxtra
+new object me
+-- CpuXtra --
+* CpuId string str-- Global level cpuid method : returns cpu type, speed & features
+ */
 
 namespace Director {
 
@@ -53,7 +55,7 @@ static const MethodProto xlibMethods[] = {
 };
 
 static const BuiltinProto xlibBuiltins[] = {
-	{ "CpuId",	CpuXtra::m_CpuId,	0, 1,	500, HBLTIN },
+	{ "CpuId",	CpuXtra::m_CpuId,	1, 1,	500, HBLTIN },
 	{ nullptr, nullptr, 0, 0, 0, VOIDSYM }
 };
 
@@ -103,7 +105,7 @@ static void addProp(Datum &list, const char *name, int value) {
 void CpuXtra::m_CpuId(int nargs) {
 	g_lingo->dropStack(nargs);
 
-	// Report a Pentium MMX at 233 MHz with an FPU, enough for any period check
+	// Returns [#CPU, #FPU, #SPEED, #MMX]: a Pentium MMX at 233 MHz passes any period check
 	Datum result;
 	result.type = PARRAY;
 	result.u.parr = new PArray;

@@ -39,10 +39,69 @@
 
 /**************************************************
  *
- * Miles Sound System Xtra 3.6E (RAD Game Tools, 1997) - silent stub: every sound reports
- * as finished (MilesGetStatus = 2), so games waiting on audio carry on.
+ * USED IN:
+ * Kitchenette (Le Lab, Windows)
+ *
+ * Sounds are played through the ScummVM mixer. MilesGetStatus returns
+ * 4 while a sound is playing (the game waits on that value), 2 otherwise.
  *
  **************************************************/
+
+/*
+-- xtra Miles
+
+--------------------------------------------------
+--  The Miles Sound System Xtra - Version 3.6E  --
+--  Copyright (C) 1991-97 RAD Game Tools, Inc.  --
+--------------------------------------------------
+
+new object
+
+*MilesQuickPlay string, integer
+*MilesQuickStream string, integer
+
+*MilesStartup
+*MilesReleaseHandles
+*MilesReacquireHandles
+*MilesShutdown
+*MilesHookToSmacker
+*MilesSetWaveOutput integer, integer, integer, integer
+*MilesGetWaveDescription
+
+MilesOpenWave object, string
+MilesOpenWaveCastmember object, string, string
+MilesOpenXMIDI object, string
+MilesOpenStream object, string
+MilesOpenCD object, integer
+MilesOpenCopy object, string
+MilesCopyFrom object
+
+MilesPlay object
+MilesPause object
+MilesResume object
+MilesClose object
+
+MilesGetStatus object
+MilesGetVolume object
+MilesGetPosition object
+MilesGetSpeed object
+MilesGetLoopCount object
+MilesGetPan object
+
+MilesSetVolume object, integer
+MilesSetPosition object, integer
+MilesSetSpeed object, integer
+MilesSetLoopCount object, integer
+MilesSetPan object, integer
+
+MilesGetCDTracks object
+MilesPlayCDTrack object, integer
+MilesPlayCDMS object, integer, integer
+MilesGetCDStartTrackMS object, integer
+MilesGetCDEndTrackMS object, integer
+MilesEjectCD object
+MilesRetractCD object
+ */
 
 namespace Director {
 
