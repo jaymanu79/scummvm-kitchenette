@@ -88,9 +88,9 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/android-deps
-          key: android-deps-${{ env.NDK_VERSION }}-${{ env.ABI }}-freetype-2.13.3-libpng-1.6.44
+          key: android-deps-${{ env.NDK_VERSION }}-${{ env.ABI }}-freetype-2.13.3-libpng-1.6.44-oboe-1.11.0
 
-      - name: Build FreeType and libpng for Android
+      - name: Build FreeType, libpng and Oboe for Android
         if: steps.deps-cache.outputs.cache-hit != 'true'
         run: |
           PREFIX="$HOME/android-deps"
@@ -105,10 +105,19 @@ jobs:
           curl -sSL https://download.sourceforge.net/libpng/libpng-1.6.44.tar.xz | tar xJ
           cmake -S libpng-1.6.44 -B png-build $CMAKE_ARGS -DPNG_SHARED=OFF -DPNG_TESTS=OFF -DPNG_TOOLS=OFF
           cmake --build png-build -j"$(nproc)" --target install
+          # Oboe: Android audio library required by the ScummVM Android mixer (same version as ScummVM's build images)
+          curl -sSL https://github.com/google/oboe/archive/refs/tags/1.11.0.tar.gz | tar xz
+          cmake -S oboe-1.11.0 -B oboe-build $CMAKE_ARGS
+          cmake --build oboe-build -j"$(nproc)" --target install
+          ls -R "$PREFIX/lib" | head -20
 
       - name: Configure
         run: |
-          export PKG_CONFIG_LIBDIR="$HOME/android-deps/lib/pkgconfig"
+          DEPS="$HOME/android-deps"
+          export PKG_CONFIG_LIBDIR="$DEPS/lib/pkgconfig"
+          # Oboe has no pkg-config file: point the compiler and linker at it directly
+          export CXXFLAGS="-I$DEPS/include"
+          export LDFLAGS="-L$DEPS/lib -L$DEPS/lib/$ABI -lOpenSLES"
           ./configure --host=android-$ABI \
             --disable-all-engines --enable-engine=director \
             --enable-freetype2 --enable-png --enable-zlib \
