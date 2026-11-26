@@ -223,6 +223,7 @@ public:
 	Graphics::MacPatterns &getPatterns();
 	void setCursor(DirectorCursor type);
 	void draw();
+	uint32 _lastUpdateStagePresent = 0;
 
 	Graphics::Primitives *getInkPrimitives();
 	uint32 getColorBlack();

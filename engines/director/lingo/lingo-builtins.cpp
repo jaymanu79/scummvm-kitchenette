@@ -3728,7 +3728,19 @@ void LB::b_updateStage(int nargs) {
 		score->_cursorDirty = false;
 	}
 
-	g_director->draw();
+	// Games may call updateStage after every single sprite move (Kitchenette
+	// moves each letter of its titles that way). Presenting the screen waits for
+	// the display refresh, so doing it on every call turns those animations
+	// into a slideshow. Compose every time, but present at most once per refresh:
+	// the next call or the next frame shows the latest state.
+	uint32 now = g_system->getMillis();
+	if (now - g_director->_lastUpdateStagePresent >= 1000 / 60) {
+		g_director->draw();
+		g_director->_lastUpdateStagePresent = g_system->getMillis();
+	} else {
+		g_director->_wm->renderZoomBox(true);
+		g_director->_wm->draw();
+	}
 
 	if (debugChannelSet(-1, kDebugFewFramesOnly)) {
 		g_director->_framesRan++;

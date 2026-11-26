@@ -14,6 +14,7 @@ projet officiel (voir `AI-GUIDELINES.md`).
 | `engines/director/metaengine.cpp` | Commandes « Buzzer joueur 1/2/3 » réaffectables (touche, souris, manette). |
 | `engines/director/frame.cpp` | Score D6 : une piste palette vide (« membre -1 du castLib 0 ») n'est plus prise pour la palette système Mac. Corrige les couleurs (écran 1/2/3, fondu noir de 8 s avant le logo). |
 | `engines/director/castmember/digitalvideo.cpp` | Vidéos synchronisées : saute les images en retard au lieu de les jouer en accéléré (logo Le Lab). |
+| `engines/director/lingo/lingo-builtins.cpp`, `director.h` | `updateStage` n'affiche l'écran qu'une fois par rafraîchissement (60 Hz) : le jeu l'appelle pour chaque lettre des titres « QUESTION N », ce qui attendait la synchro écran à chaque fois et rendait l'animation saccadée. |
 | `engines/director/score.cpp` | Director 6 : un sprite modifié par le Lingo sans `puppetSprite` (« auto-puppet ») rend la main au score à la fin de sa plage. Corrige les lettres en pavés. |
 
 ## Paquets tout faits
