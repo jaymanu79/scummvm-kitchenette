@@ -1076,11 +1076,6 @@ bool Score::renderPrePaletteCycle(RenderMode mode) {
 		int fadeFrames = kFadeColorFrames[frameRate - 1];
 		if (_version >= kFileVer500)
 			fadeFrames = kFadeColorFramesD5[frameRate - 1];
-		// D5+ speeds go from 1 (slowest) to 30 (fastest). A speed of 0 is not
-		// offered by the score editor: treat it as an immediate switch rather than
-		// as the slowest fade (494 frames, about 8 seconds of blocked playback).
-		if (_version >= kFileVer500 && _currentFrame->_mainChannels.palette.speed == 0)
-			fadeFrames = 1;
 		byte calcPal[768];
 
 		// Copy the current palette into the snapshot buffer
@@ -1411,8 +1406,6 @@ void Score::renderPaletteCycle(RenderMode mode) {
 				int fadeFrames = kFadeColorFrames[frameRate - 1];
 				if (_version >= kFileVer500)
 					fadeFrames = kFadeColorFramesD5[frameRate - 1];
-				if (_version >= kFileVer500 && _currentFrame->_mainChannels.palette.speed == 0)
-					fadeFrames = 1;
 
 				// Wait for a fixed time
 				_vm->setPalette(fadePal, 256);

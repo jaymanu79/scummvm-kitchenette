@@ -1271,6 +1271,11 @@ void Frame::readMainChannelsD6(Common::MemoryReadStreamEndian &stream, uint16 of
 			break;
 		case 120+2:
 			_mainChannels.palette.paletteId.member = stream.readSint16();
+			// An empty palette channel is stored as member -1 of castLib 0. Cast
+			// libraries start at 1 and built-in palettes use castLib -1, so this
+			// is not the system palette: there is no palette change on this frame.
+			if (_mainChannels.palette.paletteId.castLib == 0)
+				_mainChannels.palette.paletteId = CastMemberID();
 			if (!g_director->hasPalette(_mainChannels.palette.paletteId))
 				_mainChannels.palette.paletteId = CastMemberID();
 			if (!_mainChannels.palette.paletteId.isNull())
