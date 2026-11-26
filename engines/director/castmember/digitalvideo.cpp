@@ -514,6 +514,18 @@ Graphics::MacWidget *DigitalVideoCastMember::createWidget(Common::Rect &bbox, Ch
 
 	const Graphics::Surface *frame = _video->decodeNextFrame();
 
+	// Videos synced to their soundtrack (the default) drop frames when playback
+	// falls behind, e.g. after a blocking Lingo loop, instead of fast-forwarding
+	// through every late frame.
+	if (_frameRateType == kFrameRateDefault && !_getFirstFrame) {
+		for (int skipped = 0; skipped < 600 && _video->needsUpdate(); skipped++) {
+			const Graphics::Surface *next = _video->decodeNextFrame();
+			if (!next)
+				break;
+			frame = next;
+		}
+	}
+
 	// If the video gets stopped, for whatever reason, _video->getPalette() will not work.
 	// Cache it when possible.
 	if (g_director->_pixelformat.bytesPerPixel != 1) {

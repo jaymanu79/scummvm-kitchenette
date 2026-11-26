@@ -12,6 +12,8 @@ projet officiel (voir `AI-GUIDELINES.md`).
 | `engines/director/lingo/xtras/c/cpuxtra.*` | Xtra **Cpuxtra** (Le Lab) : `CpuId` renvoie `[#CPU:5, #FPU:1, #SPEED:233, #MMX:1]`. |
 | `engines/director/detection_tables.h` | Kitchenette reconnu sous son nom (Windows, français), cible `kitchenette-win-fr`. |
 | `engines/director/metaengine.cpp` | Commandes « Buzzer joueur 1/2/3 » réaffectables (touche, souris, manette). |
+| `engines/director/score.cpp` | Palette : une vitesse de transition 0 (D5+) change la palette d'un coup au lieu d'un fondu de 8 s. |
+| `engines/director/castmember/digitalvideo.cpp` | Vidéos synchronisées : saute les images en retard au lieu de les jouer en accéléré (logo Le Lab). |
 | `engines/director/score.cpp` | Director 6 : un sprite modifié par le Lingo sans `puppetSprite` (« auto-puppet ») rend la main au score à la fin de sa plage. Corrige les lettres en pavés. |
 
 ## Paquets tout faits
