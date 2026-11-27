@@ -1,80 +1,84 @@
-# [ScummVM README](https://www.scummvm.org/) · [![Translation status](https://translations.scummvm.org/widgets/scummvm/-/scummvm/svg-badge.svg)](https://translations.scummvm.org/engage/scummvm/?utm_source=widget) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md#pull-requests)
+# ScummVM — fork Kitchenette
 
-## About ScummVM
+Fork perso de ScummVM pour faire tourner **Kitchenette** (quiz télé, Macromedia Director 6.0, PC Windows).
+Branche principale : `master` (la branche `kitchenette` reste comme historique). Ces changements ne sont
+pas destinés à être proposés tels quels au projet officiel (voir `AI-GUIDELINES.md`).
 
-ScummVM allows you to play classic graphic point-and-click adventure games, text adventure games, and RPGs, as long as you already have the game data files. ScummVM replaces the executable files shipped with the games, which means you can now play your favorite games on all your favorite devices.
+Pour la documentation générale de ScummVM, voir le [README officiel](https://github.com/scummvm/scummvm/blob/master/README.md).
 
-So how did ScummVM get its name? Many of the famous LucasArts adventure games, such as Maniac Mansion and the Monkey Island series, were created using a utility called SCUMM (Script Creation Utility for Maniac Mansion). The ‘VM’ in ScummVM stands for Virtual Machine.
+## Ce que le fork ajoute
 
-While ScummVM was originally designed to run LucasArts’ SCUMM games, over time support has been added for many other games: see the full list [on our wiki](https://wiki.scummvm.org/index.php?title=Category:Supported_Games). Noteworthy titles include Broken Sword, Myst and Blade Runner, although there are countless other hidden gems to explore.
+| Fichier | Quoi |
+|---|---|
+| `engines/director/lingo/xtras/m/miles.*` | Xtra **Miles Sound System** (`mssx32.x32`) : ouverture de WAV sur disque ou de sons de cast, lecture via le mixeur ScummVM, volume, boucles, pause. `MilesGetStatus` renvoie 4 pendant la lecture, 2 sinon. |
+| `engines/director/lingo/xtras/c/cpuxtra.*` | Xtra **Cpuxtra** (Le Lab) : `CpuId` renvoie `[#CPU:5, #FPU:1, #SPEED:233, #MMX:1]`. |
+| `engines/director/detection_tables.h` | Kitchenette reconnu sous son nom (Windows, français), cible `kitchenette-win-fr`. |
+| `engines/director/metaengine.cpp` | Commandes « Buzzer joueur 1/2/3 » réaffectables (touche, souris, manette). |
+| `engines/director/frame.cpp` | Score D6 : une piste palette vide (« membre -1 du castLib 0 ») n'est plus prise pour la palette système Mac. Corrige les couleurs (écran 1/2/3, fondu noir de 8 s avant le logo). |
+| `engines/director/castmember/digitalvideo.cpp` | Vidéos synchronisées : saute les images en retard au lieu de les jouer en accéléré (logo Le Lab). |
+| `engines/director/lingo/lingo-builtins.cpp`, `director.h` | `updateStage` n'affiche l'écran qu'une fois par rafraîchissement (60 Hz) : le jeu l'appelle pour chaque lettre des titres « QUESTION N », ce qui attendait la synchro écran à chaque fois et rendait l'animation saccadée. |
+| `engines/director/score.cpp` | Director 6 : un sprite modifié par le Lingo sans `puppetSprite` (« auto-puppet ») rend la main au score à la fin de sa plage. Corrige les lettres en pavés. |
 
-For more information, compatibility lists, details on donating, the
-latest release, progress reports and more, please visit the ScummVM [home
-page](https://www.scummvm.org/).
+## Paquets tout faits
 
-## Quickstart
+GitHub Actions (`.github/workflows/kitchenette-builds.yml`) compile à chaque push sur `master` (et `kitchenette`) :
 
-For the impatient among you, here is how to get ScummVM running in five simple steps.
+- **Ubuntu** : `scummvm-kitchenette_*.deb`, installé dans `/opt/scummvm-kitchenette`, lancé par `scummvm-kitchenette`.
+  Ne remplace pas la ScummVM officielle.
+- **Android** : `ScummVM-debug.apk` (arm64), application `org.scummvm.scummvm.debug`, à côté de l'officielle.
 
-1. Download ScummVM from [our website](https://www.scummvm.org/downloads/) and install it.
+Les fichiers sont dans l'onglet Actions → l'exécution → Artifacts.
 
-2. Create a directory on your hard drive and copy the game datafiles from the original media to this directory. Repeat this for every game you want to play.
+## Compiler (Ubuntu)
 
-3. Start ScummVM, choose 'Add game', select the directory containing the game datafiles (do not try to select the datafiles themselves!) and press Choose.
+```sh
+sudo apt install build-essential libsdl2-dev zlib1g-dev libpng-dev libfreetype-dev
+./configure --disable-all-engines --enable-engine=director
+make -j$(nproc)
+```
 
-4. The Game Options dialog opens to allow configuration of various settings for the game. These can be reconfigured at any time, but for now everything should be OK at the default settings.
+## Préparer le jeu
 
-5. Select the game you want to play in the list, and press Start. To play a game next time, skip to step 5, unless you want to add more games.
+Le lanceur (`Kitchenette.exe`), les Xtras, `Lingo.ini` et trois casts ne sont pas en clair sur le CD : ils sont
+compressés dans l'installeur Wise `Installation.EXE`. Pas besoin de Windows pour les sortir :
 
->
-> Hint:
->
-> To add multiple games in one go, click the small arrow on the 'Add game' button and choose 'Mass Add'. You are again asked to select a directory, only this time ScummVM will search through all subdirectories for supported games.
+```sh
+7z x Kitchenette.iso -o/tmp/kitchenette-cd        # ou monter l'ISO
+python3 dists/kitchenette/kitchenette-install.py /tmp/kitchenette-cd ~/Jeux/Kitchenette
+```
 
+Le script copie le CD dans le dossier de destination et y ajoute les fichiers extraits de l'installeur
+(reconnus par leur MD5 : il ne marche qu'avec cette version du CD).
 
+Puis :
 
-## Reporting a bug
+```sh
+./scummvm --add -p /chemin/vers/kitchenette
+./scummvm kitchenette-win-fr
+```
 
-To report a bug, go to the ScummVM [Issue Tracker](https://bugs.scummvm.org/) and log in with your GitHub account.
+Au lancement, ScummVM prévient que le jeu n'est pas entièrement supporté : choisir « Démarrer quand même ».
 
-Please make sure the bug is reproducible, and still occurs in the latest git/[Daily build](https://buildbot.scummvm.org/#/dailybuilds) version. Also check the [compatibility list](https://www.scummvm.org/compatibility/) for that game, to ensure the issue is not already known. Please do not report bugs for games that are not listed as completable on the [Supported Games](https://wiki.scummvm.org/index.php?title=Category:Supported_Games) wiki page, or on the compatibility list. We already know those games have bugs!
+Il faut les fichiers de données de ScummVM (`classicmacfonts.dat`, `fonts.dat`…) : ceux d'une ScummVM
+installée suffisent, sinon `--extrapath=/usr/share/scummvm`.
 
-Please include the following information in the bug report:
+## Commandes
 
-- ScummVM version (test the latest git/[Daily build](https://buildbot.scummvm.org/#/dailybuilds))
-- Bug details, including instructions for how to reproduce the bug. If possible, include log files, screenshots, and any other relevant information.
-- Game language
-- Game version (for example, talkie or floppy)
-- Platform and Compiler (for example, Win32, Linux or FreeBSD)
-- An attached saved game, if possible.
-- If this bug only occurred recently, include the last version without the bug, and the first version with the bug. That way we can fix it quicker by looking at the changes made.
+- **1 / 2 / 3** : nombre de joueurs, puis saisie des noms au clavier + Entrée.
+- **A / N / P** : buzzers des joueurs 1, 2, 3 (arrêter la mosaïque, répondre).
+  Réaffectables dans Options du jeu → Raccourcis → « Kitchenette buzzers » : n'importe quelle touche, bouton de
+  souris ou bouton de manette. ScummVM ne gère qu'une manette à la fois.
+  Attention : la touche choisie tape la lettre du buzzer (a, n ou p) aussi pendant la saisie des noms.
+- **Échap** : pause.
 
-Finally, please report each issue separately; do not file multiple issues on the same ticket. It is difficult to track the status of each individual bug when they aren't on their own tickets.
+## Ce qui marche
 
-## Documentation
+Intro, choix des joueurs, mosaïque des thèmes, animations de thème, « QUESTION n », questions avec accents,
+mini-jeux (grille-pain, lave-linge, tourne-disque) avec leurs lettres, score, enchères. Jamais joué une partie complète.
 
-### User documentation
+## Reste à faire
 
-For everything you need to know about how to use ScummVM, see our [user documentation](https://docs.scummvm.org/).
-
-### The ScummVM Wiki
-
-[The wiki](https://wiki.scummvm.org/) is the place to go for information about every game supported by ScummVM. If you're a developer, there's also some very handy information in the Developer section.
-
-### Changelog
-
-Our extensive change log is available [here](NEWS.md).
-
-## SAST Tools
-
-[PVS-Studio](https://pvs-studio.com/en/pvs-studio/?utm_source=github&utm_medium=organic&utm_campaign=open_source) - static analyzer for C, C++, C#, and Java code.
-
-## Credits
-
-A massive thank you to the entire team for making the ScummVM project possible. See the credits [here](AUTHORS)!
-
------
-
-> Good Luck and Happy Adventuring\!
-> The ScummVM team.
-> <https://www.scummvm.org/>
+1. **Erreur Lingo dans le jeu du tourne-disque** : `getAt` sur `gMilesReps` qui vaut 0
+   (`PlayRepSound` ← `ChangeDisqueRep` ← `DisqueAnim`). Les sons des réponses sont déchargés par
+   `IncrSequence` alors que l'animation du disque tourne encore. Vu une fois, après des appuis au hasard.
+2. Vérifier à l'oreille le son Miles (testé seulement par le timing des animations).
