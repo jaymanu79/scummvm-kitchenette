@@ -5,7 +5,7 @@ name: Kitchenette builds
 
 on:
   push:
-    branches: [master, kitchenette]
+    branches: [master]
   workflow_dispatch:
 
 permissions:

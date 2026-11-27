@@ -1,7 +1,7 @@
 # ScummVM — fork Kitchenette
 
 Fork perso de ScummVM pour faire tourner **Kitchenette** (quiz télé, Macromedia Director 6.0, PC Windows).
-Branche principale : `master` (la branche `kitchenette` reste comme historique). Ces changements ne sont
+Branche principale : `master`. Ces changements ne sont
 pas destinés à être proposés tels quels au projet officiel (voir `AI-GUIDELINES.md`).
 
 Pour la documentation générale de ScummVM, voir le [README officiel](https://github.com/scummvm/scummvm/blob/master/README.md).
@@ -21,7 +21,7 @@ Pour la documentation générale de ScummVM, voir le [README officiel](https://g
 
 ## Paquets tout faits
 
-GitHub Actions (`.github/workflows/kitchenette-builds.yml`) compile à chaque push sur `master` (et `kitchenette`) :
+GitHub Actions (`.github/workflows/kitchenette-builds.yml`) compile à chaque push sur `master` :
 
 - **Ubuntu** : `scummvm-kitchenette_*.deb`, installé dans `/opt/scummvm-kitchenette`, lancé par `scummvm-kitchenette`.
   Ne remplace pas la ScummVM officielle.

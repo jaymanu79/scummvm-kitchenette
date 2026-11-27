@@ -2,7 +2,7 @@ name: CI
 # Fork: the upstream CI matrix is not run on pushes to this fork's branches
 on:
   push:
-    branches-ignore: [master, kitchenette]
+    branches-ignore: [master]
   pull_request:
 #  schedule:
 #    - cron: '0 0-23/4 * * *'
