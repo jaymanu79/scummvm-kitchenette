@@ -111,6 +111,10 @@ public:
 	DigitalVideoType _videoType;
 
 	byte _ditheringPalette[256*3];
+	byte _remapSrcPalette[256*3] = {};
+	byte _remapDstPalette[256*3] = {};
+	byte _remapTable[256] = {};
+	void remapToScreenPalette(Graphics::Surface *surface);
 
 	uint16 _frameRate;
 	bool _getFirstFrame;

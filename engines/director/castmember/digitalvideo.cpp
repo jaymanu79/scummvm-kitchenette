@@ -24,6 +24,7 @@
 #include "common/stream.h"
 #include "common/macresman.h"
 
+#include "graphics/palette.h"
 #include "graphics/paletteman.h"
 #include "graphics/surface.h"
 #include "graphics/macgui/macwidget.h"
@@ -482,6 +483,37 @@ bool DigitalVideoCastMember::endOfVideo() {
 			 getMovieCurrentTimeMillis() >= (uint)(_channel->_stopTime*1000/getTimeScale())));
 }
 
+// In 256 colour mode a video frame holds indices into either its own colour
+// table (8-bit codecs such as SMC or RLE) or the palette it was dithered to
+// when loaded. The stage palette may differ, e.g. when the score switches
+// palette on the frame that starts the video, so map the frame's colours to
+// the closest ones of the current palette, as QuickTime does when drawing.
+void DigitalVideoCastMember::remapToScreenPalette(Graphics::Surface *surface) {
+	if (!surface || g_director->_pixelformat.bytesPerPixel != 1 || surface->format.bytesPerPixel != 1)
+		return;
+
+	const byte *srcPal = _video->getPalette();
+	if (!srcPal)
+		srcPal = _ditheringPalette;
+	const byte *screenPal = g_director->getPalette();
+	if (!screenPal || !memcmp(srcPal, screenPal, 256 * 3))
+		return;
+
+	if (memcmp(srcPal, _remapSrcPalette, 256 * 3) || memcmp(screenPal, _remapDstPalette, 256 * 3)) {
+		Graphics::PaletteLookup lookup(screenPal, 256);
+		for (int i = 0; i < 256; i++)
+			_remapTable[i] = lookup.findBestColor(srcPal[i * 3], srcPal[i * 3 + 1], srcPal[i * 3 + 2]);
+		memcpy(_remapSrcPalette, srcPal, 256 * 3);
+		memcpy(_remapDstPalette, screenPal, 256 * 3);
+	}
+
+	for (int y = 0; y < surface->h; y++) {
+		byte *row = (byte *)surface->getBasePtr(0, y);
+		for (int x = 0; x < surface->w; x++)
+			row[x] = _remapTable[row[x]];
+	}
+}
+
 Graphics::MacWidget *DigitalVideoCastMember::createWidget(Common::Rect &bbox, Channel *channel, SpriteType spriteType) {
 	if (_emptyFile)
 		return nullptr;
@@ -547,6 +579,7 @@ Graphics::MacWidget *DigitalVideoCastMember::createWidget(Common::Rect &bbox, Ch
 		if (frame->getPixels()) {
 			// Video should have the dithering palette set, decode using whatever palette we have now
 			_lastFrame = frame->convertTo(g_director->_pixelformat, _ditheringPalette);
+			remapToScreenPalette(_lastFrame);
 		} else {
 			warning("DigitalVideoCastMember::createWidget(): frame has no pixel data");
 		}
