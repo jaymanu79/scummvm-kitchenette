@@ -534,13 +534,24 @@ void Score::updateCurrentFrame() {
 void Score::updateNextFrameTime() {
 	byte tempo = _currentFrame->_mainChannels.tempo ? _currentFrame->_mainChannels.tempo : _currentFrame->_mainChannels.scoreCachedTempo;
 	// puppetTempo is overridden by changes in score tempo
+	bool puppetTempoFps = false;
 	if (_currentFrame->_mainChannels.tempo || tempo != _lastTempo) {
 		_puppetTempo = 0;
 	} else if (_puppetTempo) {
-		tempo = _puppetTempo;
+		// From D6 on, the score stores frame rates as tempo 246 plus a cue
+		// value, but puppetTempo still takes a plain frame rate.
+		if (_version >= kFileVer600 && _puppetTempo <= 120)
+			puppetTempoFps = true;
+		else
+			tempo = _puppetTempo;
 	}
 
-	if (tempo) {
+	if (puppetTempoFps) {
+		_currentFrameRate = _puppetTempo;
+		if (_vm->_fpsLimit)
+			_currentFrameRate = MIN(_vm->_fpsLimit, _currentFrameRate);
+		_nextFrameTime = g_system->getMillis() + 1000.0 / (float)_currentFrameRate;
+	} else if (tempo) {
 		if (_version < kFileVer600) {
 			const bool waitForClickOnly = _version < kFileVer300;
 			int maxDelay = 60;
