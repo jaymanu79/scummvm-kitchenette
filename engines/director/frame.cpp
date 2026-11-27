@@ -1473,6 +1473,11 @@ void readSpriteDataD6(Common::SeekableReadStreamEndian &stream, Sprite &sprite, 
 			break;
 		case 4: {
 				int castLib = stream.readSint16();
+				// Some D6 scores store castLib -1 for sprites of the movie's
+				// own cast (Kitchenette's spinning washing machine porthole).
+				// There is no cast library -1, so use the internal cast.
+				if (castLib == -1)
+					castLib = DEFAULT_CAST_LIB;
 				sprite._castId = CastMemberID(sprite._castId.member, castLib);
 				sprite._copyBackMask |= kSCBCastId;
 				debugC(6, kDebugLoading, "    sprite._castId: %d", sprite._castId.member);

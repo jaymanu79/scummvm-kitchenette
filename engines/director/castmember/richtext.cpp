@@ -22,6 +22,8 @@
 #include "common/stream.h"
 #include "graphics/macgui/macwidget.h"
 
+#include "common/hashmap.h"
+
 #include "director/director.h"
 #include "director/cast.h"
 #include "director/channel.h"
@@ -191,7 +193,49 @@ Graphics::MacWidget *RichTextCastMember::createWidget(Common::Rect &bbox, Channe
 	if (channel->_sprite->_ink == kInkTypeBackgndTrans)
 		src = _picture;
 
-	if (dstBpp == 1) {
+	if (dstBpp == 1 && src == _picture) {
+		// The text bitmap without background only has meaning through its
+		// alpha channel, which a plain conversion to 256 colours drops: the
+		// see-through parts came out as an opaque block. Use the sprite's
+		// background colour there, which background transparent ink then
+		// leaves out, and the closest palette colour elsewhere.
+		const byte *pal = g_director->_wm->getPalette();
+		int palSize = g_director->_wm->getPaletteSize();
+		const Graphics::Surface &alphaSrc = src->_surface;
+		dithered = new Graphics::Surface();
+		dithered->create(alphaSrc.w, alphaSrc.h, g_director->_wm->_pixelformat);
+		byte transparent = (byte)channel->_sprite->_backColor;
+		// Opaque pixels must not take the transparent index, even when it is
+		// the closest colour (white text over a white background colour).
+		Common::HashMap<uint32, byte> cache;
+		for (int y = 0; y < alphaSrc.h; y++) {
+			for (int x = 0; x < alphaSrc.w; x++) {
+				uint8 a, r, g, b;
+				alphaSrc.format.colorToARGB(alphaSrc.getPixel(x, y), a, r, g, b);
+				byte idx = transparent;
+				if (a >= 128) {
+					uint32 key = (r << 16) | (g << 8) | b;
+					if (cache.contains(key)) {
+						idx = cache[key];
+					} else {
+						uint best = 0xffffffff;
+						for (int i = 0; i < palSize; i++) {
+							if (i == transparent)
+								continue;
+							int dr = pal[i * 3] - r, dg = pal[i * 3 + 1] - g, db = pal[i * 3 + 2] - b;
+							uint d = dr * dr + dg * dg + db * db;
+							if (d < best) {
+								best = d;
+								idx = i;
+							}
+						}
+						cache[key] = idx;
+					}
+				}
+				*(byte *)dithered->getBasePtr(x, y) = idx;
+			}
+		}
+	} else if (dstBpp == 1) {
 		dithered = src->_surface.convertTo(g_director->_wm->_pixelformat, nullptr, 0, g_director->_wm->getPalette(), g_director->_wm->getPaletteSize());
 	}
 
