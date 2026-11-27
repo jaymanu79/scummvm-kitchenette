@@ -3168,6 +3168,10 @@ void LB::b_puppetPalette(int nargs) {
 			}
 
 		}
+		// Built-in palettes can be given by their negative number,
+		// e.g. puppetPalette(-3) for grayscale.
+		if (palette.isNull() && d.type == INT && d.u.i < 0)
+			palette = CastMemberID(d.u.i, -1);
 		if (palette.isNull()) {
 			CastMember *member = movie->getCastMember(d.asMemberID());
 

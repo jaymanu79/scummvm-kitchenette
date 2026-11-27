@@ -1344,10 +1344,10 @@ void Frame::readMainChannelsD6(Common::MemoryReadStreamEndian &stream, uint16 of
 	// The castLib and member of the palette channel can come in separate
 	// deltas (e.g. only castLib changes from -1 to 0), so check the empty
 	// channel marker on the combined value as well.
-	if (_mainChannels.palette.paletteId.castLib == 0)
+	if (_mainChannels.palette.paletteId.castLib == 0 || _mainChannels.palette.paletteId.member == 0)
 		_mainChannels.palette.paletteId = CastMemberID();
 
-		_mainChannels.transChunkSize = CLIP<byte>(_mainChannels.transChunkSize, 0, 128);
+	_mainChannels.transChunkSize = CLIP<byte>(_mainChannels.transChunkSize, 0, 128);
 	_mainChannels.transDuration = CLIP<uint16>(_mainChannels.transDuration, 0, 32000);  // restrict to 32 secs
 }
 

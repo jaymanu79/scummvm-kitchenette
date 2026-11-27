@@ -128,6 +128,12 @@ Channel::~Channel() {
 
 DirectorPlotData Channel::getPlotData() {
 	int blend = (_sprite->_thickness & kTHasBlend) || _sprite->_ink == kInkTypeBlend ? _sprite->_blendAmount : 0;
+	// D6 scores store the blend as an opacity (255 = 100%), while the blend
+	// amount here is a transparency, as set from Lingo. Without this a 100%
+	// blended sprite from the score is not drawn at all (Kitchenette's credits).
+	if (g_director->getVersion() >= 600 && g_director->getVersion() < 700 &&
+			(_sprite->_thickness & kTHasBlend) && !_sprite->_puppet && !(_sprite->_autoPuppet & kAPBlend))
+		blend = 255 - _sprite->_blendAmount;
 	DirectorPlotData pd(g_director, _sprite->_spriteType, _sprite->_ink, blend, _sprite->getBackColor(), _sprite->getForeColor());
 	pd.colorWhite = g_director->getColorWhite();
 	pd.colorBlack = g_director->getColorBlack();
